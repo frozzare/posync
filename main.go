@@ -27,11 +27,12 @@ type File struct {
 
 // Config represents a config struct.
 type Config struct {
-	ID     string
-	Files  []File
-	Path   string
-	Token  string
-	Upload bool
+	Download bool
+	ID       string
+	Files    []File
+	Path     string
+	Token    string
+	Upload   bool
 }
 
 // body represents the response from POEditor api.
@@ -199,18 +200,20 @@ func main() {
 		uploadRequest(config.Token, config.ID, config.Path)
 	}
 
-	for _, file := range config.Files {
-		body := downloadRequest(config.Token, config.ID, file.Lang)
+	if config.Download {
+		for _, file := range config.Files {
+			body := downloadRequest(config.Token, config.ID, file.Lang)
 
-		if body == nil {
-			continue
-		}
+			if body == nil {
+				continue
+			}
 
-		if body.Response.Code == "200" {
-			downloadFromURL(file.Path, body.Item)
-			fmt.Println(file.Path, "downloaded")
-		} else {
-			fmt.Println("Failed response from POEditor:", body.Response.Message, "-", file.Lang)
+			if body.Response.Code == "200" {
+				downloadFromURL(file.Path, body.Item)
+				fmt.Println(file.Path, "downloaded")
+			} else {
+				fmt.Println("Failed response from POEditor:", body.Response.Message, "-", file.Lang)
+			}
 		}
 	}
 }
