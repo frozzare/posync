@@ -1,6 +1,6 @@
 # poeditor-sync
 
-Download files from [poeditor.com](https://poeditor.com).
+Upload pot and download mo files from [poeditor.com](https://poeditor.com).
 
 ## Installation
 
