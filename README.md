@@ -5,7 +5,7 @@ Download files from [poeditor.com](https://poeditor.com).
 ## Installation
 
 ```
-go get github.com/frozzare/poeditor-sync
+go get github.com/frozzare/posync
 ```
 
 ## Usage
@@ -13,7 +13,7 @@ go get github.com/frozzare/poeditor-sync
 Edit config file with api token, project id and files.
 
 ```
-poeditor-sync --config=/path/to/config.json
+posync --config=/path/to/config.json
 ```
 
 ## License
