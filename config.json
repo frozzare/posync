@@ -1,5 +1,7 @@
 {
     "id": "project id",
+    "upload": true,
+    "path": "/path/to/file.pot",
     "token": "api token",
     "files": [
         {
