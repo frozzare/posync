@@ -1,4 +1,4 @@
-# poeditor-sync
+# posync
 
 Upload pot and download mo files from [poeditor.com](https://poeditor.com).
 
