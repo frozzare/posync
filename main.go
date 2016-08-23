@@ -1,14 +1,17 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -24,10 +27,11 @@ type File struct {
 
 // Config represents a config struct.
 type Config struct {
-	ID    string
-	Files []File
-	Token string
-	Type  string
+	ID     string
+	Files  []File
+	Path   string
+	Token  string
+	Upload bool
 }
 
 // body represents the response from POEditor api.
@@ -60,19 +64,76 @@ func getConfig() Config {
 	return config
 }
 
-// request will do a request to POEditor and get
-// the download file url.
-func request(token, typ, id, lang string) *body {
-	form := url.Values{}
+// uploadRequest will do a request to POEditor with pot file.
+func uploadRequest(token, id, path string) {
+	file, err := os.Open(path)
 
-	if len(typ) == 0 {
-		typ = "mo"
+	if err != nil {
+		fmt.Println("Error while reading file", err)
+		return
 	}
+	defer file.Close()
+
+	form := &bytes.Buffer{}
+	writer := multipart.NewWriter(form)
+	part, err := writer.CreateFormFile("file", filepath.Base(path))
+	if err != nil {
+		fmt.Println("Error while doing writer", err)
+		return
+	}
+	_, err = io.Copy(part, file)
+
+	writer.WriteField("api_token", token)
+	writer.WriteField("action", "upload")
+	writer.WriteField("id", id)
+	writer.WriteField("updating", "terms")
+
+	err = writer.Close()
+	if err != nil {
+		fmt.Println("Error while doing writer", err)
+		return
+	}
+
+	req, err := http.NewRequest("POST", "https://poeditor.com/api/", form)
+	req.Header.Add("Content-Type", writer.FormDataContentType())
+
+	if err != nil {
+		fmt.Println("Error while creating request", err)
+		return
+	}
+
+	client := &http.Client{}
+	res, err := client.Do(req)
+
+	if err != nil {
+		fmt.Println("Error while doing request", err)
+		return
+	}
+
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	var b *body
+	err = decoder.Decode(&b)
+
+	if err != nil {
+		fmt.Println("Error while decoding", err)
+		return
+	}
+
+	fmt.Println("Response:", b.Response.Status, "-", b.Response.Message)
+}
+
+// downloadRequest will do a request to POEditor and get
+// the download file url.
+func downloadRequest(token, id, lang string) *body {
+	form := url.Values{}
 
 	form.Add("api_token", token)
 	form.Add("action", "export")
 	form.Add("id", id)
-	form.Add("type", typ)
+	form.Add("type", "mo")
 	form.Add("language", lang)
 
 	req, err := http.NewRequest("POST", "https://poeditor.com/api/", strings.NewReader(form.Encode()))
@@ -134,8 +195,12 @@ func main() {
 
 	config := getConfig()
 
+	if config.Upload {
+		uploadRequest(config.Token, config.ID, config.Path)
+	}
+
 	for _, file := range config.Files {
-		body := request(config.Token, config.Type, config.ID, file.Lang)
+		body := downloadRequest(config.Token, config.ID, file.Lang)
 
 		if body == nil {
 			continue
