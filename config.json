@@ -6,8 +6,8 @@
     "token": "api token",
     "files": [
         {
-            "lang": "file lang",
-            "path": "file path"
+            "lang": "en",
+            "path": "/path/to/file.mo"
         }
     ]
 }
