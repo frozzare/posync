@@ -13,7 +13,7 @@ go get github.com/frozzare/poeditor-sync
 Edit config file with api token, project id and files.
 
 ```
-poeditor-sync --config=/path/toconfig.json
+poeditor-sync --config=/path/to/config.json
 ```
 
 ## License
