@@ -1,0 +1,10 @@
+{
+    "id": "project id",
+    "token": "api token",
+    "files": [
+        {
+            "lang": "file lang",
+            "path": "file path"
+        }
+    ]
+}
