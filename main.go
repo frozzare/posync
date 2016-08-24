@@ -83,6 +83,10 @@ func uploadRequest(token, id, path string) {
 		return
 	}
 	_, err = io.Copy(part, file)
+	if err != nil {
+		fmt.Println("Error while doing copy", err)
+		return
+	}
 
 	writer.WriteField("api_token", token)
 	writer.WriteField("action", "upload")
