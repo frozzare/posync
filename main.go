@@ -82,6 +82,7 @@ func uploadRequest(token, id, path string) {
 		fmt.Println("Error while doing writer", err)
 		return
 	}
+
 	_, err = io.Copy(part, file)
 	if err != nil {
 		fmt.Println("Error while doing copy", err)
