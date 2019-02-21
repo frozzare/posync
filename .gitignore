@@ -2,4 +2,5 @@
 *.po*
 posync*
 config.json
+dist
 testdata
