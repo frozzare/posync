@@ -32,6 +32,7 @@ type Config struct {
 	Files    []File
 	Path     string
 	Token    string
+	Type     string
 	Upload   bool
 }
 
@@ -42,7 +43,9 @@ type body struct {
 		Message string
 		Status  string
 	}
-	Item string
+	Result struct {
+		URL string
+	}
 }
 
 // getConfig will return config instance.
@@ -90,7 +93,6 @@ func uploadRequest(token, id, path string) {
 	}
 
 	writer.WriteField("api_token", token)
-	writer.WriteField("action", "upload")
 	writer.WriteField("id", id)
 	writer.WriteField("updating", "terms")
 
@@ -100,7 +102,7 @@ func uploadRequest(token, id, path string) {
 		return
 	}
 
-	req, err := http.NewRequest("POST", "https://poeditor.com/api/", form)
+	req, err := http.NewRequest("POST", "https://api.poeditor.com/v2/projects/upload", form)
 	req.Header.Add("Content-Type", writer.FormDataContentType())
 
 	if err != nil {
@@ -128,21 +130,20 @@ func uploadRequest(token, id, path string) {
 		return
 	}
 
-	fmt.Println("Response:", b.Response.Status, "-", b.Response.Message)
+	fmt.Println("Upload response:", b.Response.Status, "-", b.Response.Message)
 }
 
 // downloadRequest will do a request to POEditor and get
 // the download file url.
-func downloadRequest(token, id, lang string) *body {
+func downloadRequest(token, id, lang, typ string) *body {
 	form := url.Values{}
 
 	form.Add("api_token", token)
-	form.Add("action", "export")
 	form.Add("id", id)
-	form.Add("type", "mo")
+	form.Add("type", typ)
 	form.Add("language", lang)
 
-	req, err := http.NewRequest("POST", "https://poeditor.com/api/", strings.NewReader(form.Encode()))
+	req, err := http.NewRequest("POST", "https://api.poeditor.com/v2/projects/export", strings.NewReader(form.Encode()))
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	if err != nil {
@@ -207,15 +208,15 @@ func main() {
 
 	if config.Download {
 		for _, file := range config.Files {
-			body := downloadRequest(config.Token, config.ID, file.Lang)
+			body := downloadRequest(config.Token, config.ID, file.Lang, config.Type)
 
 			if body == nil {
 				continue
 			}
 
 			if body.Response.Code == "200" {
-				downloadFromURL(file.Path, body.Item)
-				fmt.Println(file.Path, "downloaded")
+				downloadFromURL(file.Path, body.Result.URL)
+				fmt.Println("Download response:", file.Path, "downloaded")
 			} else {
 				fmt.Println("Failed response from POEditor:", body.Response.Message, "-", file.Lang)
 			}

@@ -1,3 +1,5 @@
 *.mo
 *.po*
 posync*
+config.json
+testdata

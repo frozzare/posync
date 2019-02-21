@@ -9,5 +9,6 @@
             "lang": "en",
             "path": "/path/to/file.mo"
         }
-    ]
+    ],
+    "type": "mo"
 }
