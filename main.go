@@ -138,6 +138,10 @@ func uploadRequest(token, id, path string) {
 func downloadRequest(token, id, lang, typ string) *body {
 	form := url.Values{}
 
+	if typ == "" {
+		typ = "mo"
+	}
+
 	form.Add("api_token", token)
 	form.Add("id", id)
 	form.Add("type", typ)
