@@ -16,7 +16,9 @@ import (
 )
 
 var (
-	configFlag = flag.String("config", "", "Path to config file")
+	configFlag  = flag.String("config", "", "Path to config file")
+	versionFlag = flag.Bool("version", false, "Print posync version")
+	version     = "master"
 )
 
 // File represents a config file struct.
@@ -203,6 +205,11 @@ func downloadFromURL(path, url string) {
 
 func main() {
 	flag.Parse()
+
+	if *versionFlag {
+		fmt.Printf("posync version %s\n", version)
+		os.Exit(0)
+	}
 
 	config := getConfig()
 

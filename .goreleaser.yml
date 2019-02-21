@@ -1,0 +1,39 @@
+build:
+  main: main.go
+  binary: posync
+  ldflags: -s -w -X main.version={{.Version}}
+  goos:
+    - darwin
+    - linux
+  goarch:
+    - 386
+    - amd64
+    - arm
+    - arm64
+  ignore:
+    - goos: darwin
+      goarch: 386
+archive:
+  name_template: '{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+  format: tar.gz
+  files:
+    - LICENSE
+    - README.md
+snapshot:
+  name_template: SNAPSHOT-{{ .Commit }}
+checksum:
+  name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
+release:
+  github:
+    owner: frozzare
+    name: posync
+brew:
+  github:
+    owner: frozzare
+    name: homebrew-tap
+  homepage: https://github.com/frozzare/posync
+  description: Upload pot and download mo files from poeditor.com
+  test: |
+    system "#{bin}/posync --version"
+  install: |
+    bin.install "posync"
